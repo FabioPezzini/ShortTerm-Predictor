@@ -3,10 +3,10 @@ close all;
 %N.B = Runnare prima main e poi il tryfunc (questo per poter ricavare prima
 %i thetaCap)
 
-%La funzione richiede la scrittura in T (array 1x6) delle misure rilevate
-%da giovedi' a martedi' ed effettua la predizione sul mercoledi
+%La funzione richiede la scrittura in T (array 1x7) delle misure rilevate
+%da giovedi' a mercoledi' ed effettua la predizione sul mercoledi' succ
 
-T = [35,1401788389583 35,5871627635417 34,9352095785 33,6609246901667 28,9101644515417 25,5626735807917 33,8653852538333];
+T = [33.887096283666665 34.322414632125000 34.652158858541670 33.578615787583340 28.956420815750004 25.413061986749995 32.052170129833335];
 %Ho scelto una settimana a caso dal dataset , inserendo da mer a mar e
 %cercando di trovare il mer successivo
 
@@ -20,16 +20,10 @@ mar = T(1,7);
 
 w = 1; %  2 * pi/365;
 phiFourPrev = ones(size(mer));
-for n = 1:12
+for n = 1:2
     phiFourPrev = [phiFourPrev, cos(n*w.*mer),sin(n*w.*mer),cos(n*w.*gio),sin(n*w.*gio),cos(n*w.*ven),sin(n*w.*ven),cos(n*w.*sab),sin(n*w.*sab),cos(n*w.*dom),sin(n*w.*dom),cos(n*w.*lun),sin(n*w.*lun),cos(n*w.*mar),sin(n*w.*mar)];
 end
 
 PREVISIONE = phiFourPrev * thetaCapFour;
 
-%Atteso: 35,3478288770833    dati da 315 a 322
-%Previsione: 35.269515609556755
-
-
-%OTTIMO
-
-% Mi salvo il ThetaCap Ottimale
+%Atteso: 33.119001948874995    dati da 315 a 322
