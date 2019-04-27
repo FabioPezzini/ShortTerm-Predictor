@@ -3,6 +3,25 @@ clear;
 close all;
 
 %Carico i dati all'interno di una tabella
+
+data = readtable('data.xlsx','Range','A2:C732');
+dataTab = data {:,:};
+dataTabCp1 = dataTab(1:365,:);
+dataTabCp2 = dataTab(366:730,:);
+
+%Differenze tra Anno1 e Anno 2
+title('Consumi Anno1 VS Consumi Anno2');
+figure(1)
+subplot(2,1,1);
+scatter(dataTabCp1(:,1),dataTabCp1(:,3));
+hold on;
+subplot(2,1,2);
+scatter(dataTabCp2(:,1),dataTabCp2(:,3));
+xlabel('Giorno');
+ylabel('Consumo Energetico');
+
+
+%Carico i dati all'interno di una tabella
 data = readtable('data.xlsx','Range','A2:C732');
 dataTab = data {:,:};
 dataTabCp = dataTab;
@@ -42,6 +61,10 @@ end
 shuffledArray = misure(randperm(size(misure,1)),:);
 %IN QUESTO MODO HO SETTIMANE DA MERCOLEDI A MARTEDI CASUALI, CONTENENTI
 %ANNO 1 E ANNO 2
+
+settimane(1:70,1) = 1:70;
+settimaneVal(1:33,1) = 1:33;
+
 mer = shuffledArray(:,1);
 mer1= mer(1:70,:);
 mer2= mer(71:103,:);
@@ -87,9 +110,8 @@ misuraStimataL2VAL = phiL2VAL * thetaCapL2;
 scartoL2VAL = y2 - misuraStimataL2VAL;
 SSRL2VAL = scartoL2VAL' * scartoL2VAL;
 
-figure (1);
+figure (2);
 subplot(2,1,1);
-settimane(1:70,1) = 1:70;
 scatter(settimane,y1,'r','o');
 hold on;
 scatter(settimane,misuraStimataL2,'b','x');
@@ -122,7 +144,7 @@ misuraStimataL3VAL = phiL3VAL * thetaCapL3;
 scartoL3VAL = y2 - misuraStimataL3VAL;
 SSRL3VAL = scartoL3VAL' * scartoL3VAL;
 
-figure (2);
+figure (3);
 subplot(2,1,1);
 scatter(settimane,y1,'r','o');
 hold on;
@@ -145,7 +167,27 @@ title('Modello Lineare Ordine 3 VALIDAZIONE');
 %Si nota un'andamento sinusoidale, provo serie di Fourier
 %N.B = variare il max di n per variare il grado
 
-w = 1; %era 2 * pi / 365 ma con 1 (come suggerito dal tutore) e' meglio!!
+%14 armoniche
+w = 1;
+phiFour14 = ones(size(mer1));
+for n = 1:1
+    phiFour14 = [phiFour14, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour14 = phiFour14 \ y1;
+misuraStimataFour14 = phiFour14 * thetaCapFour14;
+scartoFour14 = y1 - misuraStimataFour14;
+SSRFOUR14 = scartoFour14' * scartoFour14;
+
+phiFourVAL14 = ones(size(mer2));
+for n = 1:1
+    phiFourVAL14 = [phiFourVAL14, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL14 = phiFourVAL14 * thetaCapFour14;
+scartoFourVAL14 = y2 - misuraStimataFourVAL14;
+SSRFOURVAL14 = scartoFourVAL14' * scartoFourVAL14;
+
+%28 armoniche
+w = 1;
 phiFour = ones(size(mer1));
 for n = 1:2
     phiFour = [phiFour, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
@@ -164,7 +206,7 @@ misuraStimataFourVAL = phiFourVAL * thetaCapFour;
 scartoFourVAL = y2 - misuraStimataFourVAL;
 SSRFOURVAL = scartoFourVAL' * scartoFourVAL;
 
-figure (3);
+figure (4);
 subplot(2,1,1);
 scatter(settimane,y1,'r','o');
 hold on;
@@ -184,6 +226,121 @@ legend('Atteso','Stimato');
 title('Modello Fourier VALIDAZIONE');
 
 %Il risultato e' soddisfacente, lo scarto e' basso
+%Provo aumentando il numero di armoniche
+
+%42 ARMONICHE
+w = 1;
+phiFour42 = ones(size(mer1));
+for n = 1:3
+    phiFour42 = [phiFour42, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour42 = phiFour42 \ y1;
+misuraStimataFour42 = phiFour42 * thetaCapFour42;
+scartoFour42 = y1 - misuraStimataFour42;
+SSRFOUR42 = scartoFour42' * scartoFour42;
+
+phiFourVAL42 = ones(size(mer2));
+for n = 1:3
+    phiFourVAL42 = [phiFourVAL42, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL42 = phiFourVAL42 * thetaCapFour42;
+scartoFourVAL42 = y2 - misuraStimataFourVAL42;
+SSRFOURVAL42 = scartoFourVAL42' * scartoFourVAL42;
+
+%56 ARMONICHE
+w = 1;
+phiFour56 = ones(size(mer1));
+for n = 1:4
+    phiFour56 = [phiFour56, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour56 = phiFour56 \ y1;
+misuraStimataFour56 = phiFour56 * thetaCapFour56;
+scartoFour56 = y1 - misuraStimataFour56;
+SSRFOUR56 = scartoFour56' * scartoFour56;
+
+phiFourVAL56 = ones(size(mer2));
+for n = 1:4
+    phiFourVAL56 = [phiFourVAL56, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL56 = phiFourVAL56 * thetaCapFour56;
+scartoFourVAL56 = y2 - misuraStimataFourVAL56;
+SSRFOURVAL56 = scartoFourVAL56' * scartoFourVAL56;
+
+%70 ARMONICHE
+w = 1;
+phiFour70 = ones(size(mer1));
+for n = 1:5
+    phiFour70 = [phiFour70, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour70 = phiFour70 \ y1;
+misuraStimataFour70 = phiFour70 * thetaCapFour70;
+scartoFour70 = y1 - misuraStimataFour70;
+SSRFOUR70 = scartoFour70' * scartoFour70;
+
+phiFourVAL70 = ones(size(mer2));
+for n = 1:5
+    phiFourVAL70 = [phiFourVAL70, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL70 = phiFourVAL70 * thetaCapFour70;
+scartoFourVAL70 = y2 - misuraStimataFourVAL70;
+SSRFOURVAL70 = scartoFourVAL70' * scartoFourVAL70;
+
+%84 ARMONICHE
+w = 1;
+phiFour84 = ones(size(mer1));
+for n = 1:6
+    phiFour84 = [phiFour84, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour84 = phiFour84 \ y1;
+misuraStimataFour84 = phiFour84 * thetaCapFour84;
+scartoFour84 = y1 - misuraStimataFour84;
+SSRFOUR84 = scartoFour84' * scartoFour84;
+
+phiFourVAL84 = ones(size(mer2));
+for n = 1:6
+    phiFourVAL84 = [phiFourVAL84, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL84 = phiFourVAL84 * thetaCapFour84;
+scartoFourVAL84 = y2 - misuraStimataFourVAL84;
+SSRFOURVAL84 = scartoFourVAL84' * scartoFourVAL84;
+
+%98 ARMONICHE
+w = 1;
+phiFour98 = ones(size(mer1));
+for n = 1:7
+    phiFour98 = [phiFour98, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour98 = phiFour98 \ y1;
+misuraStimataFour98 = phiFour98 * thetaCapFour98;
+scartoFour98 = y1 - misuraStimataFour98;
+SSRFOUR98 = scartoFour98' * scartoFour98;
+
+phiFourVAL98 = ones(size(mer2));
+for n = 1:7
+    phiFourVAL98 = [phiFourVAL98, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL98 = phiFourVAL98 * thetaCapFour98;
+scartoFourVAL98 = y2 - misuraStimataFourVAL98;
+SSRFOURVAL98 = scartoFourVAL98' * scartoFourVAL98;
+
+%112 ARMONICHE
+w = 1;
+phiFour112 = ones(size(mer1));
+for n = 1:8
+    phiFour112 = [phiFour112, cos(n*w.*mer1),sin(n*w.*mer1),cos(n*w.*gio1),sin(n*w.*gio1),cos(n*w.*ven1),sin(n*w.*ven1),cos(n*w.*sab1),sin(n*w.*sab1),cos(n*w.*dom1),sin(n*w.*dom1),cos(n*w.*lun1),sin(n*w.*lun1),cos(n*w.*mar1),sin(n*w.*mar1)];
+end
+thetaCapFour112 = phiFour112 \ y1;
+misuraStimataFour112 = phiFour112 * thetaCapFour112;
+scartoFour112 = y1 - misuraStimataFour112;
+SSRFOUR112 = scartoFour112' * scartoFour112;
+
+phiFourVAL112 = ones(size(mer2));
+for n = 1:8
+    phiFourVAL112 = [phiFourVAL112, cos(n*w.*mer2),sin(n*w.*mer2),cos(n*w.*gio2),sin(n*w.*gio2),cos(n*w.*ven2),sin(n*w.*ven2),cos(n*w.*sab2),sin(n*w.*sab2),cos(n*w.*dom2),sin(n*w.*dom2),cos(n*w.*lun2),sin(n*w.*lun2),cos(n*w.*mar2),sin(n*w.*mar2)];
+end
+misuraStimataFourVAL112 = phiFourVAL112 * thetaCapFour112;
+scartoFourVAL112 = y2 - misuraStimataFourVAL112;
+SSRFOURVAL112 = scartoFourVAL112' * scartoFourVAL112;
 
 %----------------------------------------------------------------------------------------------------------------------
 %Utilizzo una rete neurale con ingresso due input
@@ -253,7 +410,7 @@ testPerformance = perform(net,testTargets,y);
 %figure, ploterrhist(e)
 %figure, plotregression(t,y)
 %figure, plotfit(net,x,t)
-figure (4);
+figure (5);
 settimane(1:103,1) = 1:103;
 scatter(settimane,vertcat(y1,y2),'r','o');
 hold on;
@@ -271,11 +428,44 @@ fpeL3 = ((length(vertcat(y1,y2))+length(thetaCapL3))/(length(vertcat(y1,y2))-len
 fpeFOUR = ((length(vertcat(y1,y2))+length(thetaCapFour))/(length(vertcat(y1,y2))-length(thetaCapFour))) * SSRFOUR;
 
 %TEST AIC
-aicL2 = (2*length(thetaCapL2)/length(vertcat(y1,y2)))+log(SSRL2);
-aicL3 = (2*length(thetaCapL3)/length(vertcat(y1,y2)))+log(SSRL3);
-aicFOUR = (2*length(thetaCapFour)/length(vertcat(y1,y2)))+log(SSRFOUR);
+aicL2 = (2*length(thetaCapL2)/length(y1))+log(SSRL2);
+aicL3 = (2*length(thetaCapL3)/length(y1))+log(SSRL3);
+aicFOUR4 = (2*length(thetaCapFour14)/length(y1))+log(SSRFOUR14);
+aicFOUR = (2*length(thetaCapFour)/length(y1))+log(SSRFOUR);
+aicFOUR12 = (2*length(thetaCapFour42)/length(y1))+log(SSRFOUR42);
+aicFOUR16 = (2*length(thetaCapFour56)/length(y1))+log(SSRFOUR56);
+aicFOUR20 = (2*length(thetaCapFour70)/length(y1))+log(SSRFOUR70);
+aicFOUR24 = (2*length(thetaCapFour84)/length(y1))+log(SSRFOUR84);
+aicFOUR28 = (2*length(thetaCapFour98)/length(y1))+log(SSRFOUR98);
+aicFOUR32 = (2*length(thetaCapFour112)/length(y1))+log(SSRFOUR112);
 aicNET = (2*length(thetaCapNET)/nt)+log(SSRNET);
 
-%Grazie al Test AIC ed ai grafici si nota che sia il modello migliore
-%risulta essere sempre quello di Fourier con 8 armoniche anche se la lineare
+%TEST AIC VAL
+aicL2VAL = (2*length(thetaCapL2)/length(y))+log(SSRL2VAL);
+aicFOURVAL4 = (2*length(thetaCapFour14)/length(y2))+log(SSRFOURVAL14);
+aicFOURVAL = (2*length(thetaCapFour)/length(y2))+log(SSRFOURVAL);
+aicFOURVAL12 = (2*length(thetaCapFour42)/length(y2))+log(SSRFOURVAL42);
+aicFOURVAL16 = (2*length(thetaCapFour56)/length(y2))+log(SSRFOURVAL56);
+aicFOURVAL20 = (2*length(thetaCapFour70)/length(y2))+log(SSRFOURVAL70);
+aicFOURVAL24 = (2*length(thetaCapFour84)/length(y2))+log(SSRFOURVAL84);
+aicFOURVAL28 = (2*length(thetaCapFour98)/length(y2))+log(SSRFOURVAL98);
+aicFOURVAL32 = (2*length(thetaCapFour112)/length(y2))+log(SSRFOURVAL112);
+
+aic = [ aicFOUR4 , aicFOUR , aicFOUR12 , aicFOUR16 , aicFOUR20 , aicFOUR24 , aicFOUR28 , aicFOUR32];
+aicVAL = [aicFOURVAL4 , aicFOURVAL , aicFOURVAL12 , aicFOURVAL16 , aicFOURVAL20 , aicFOURVAL24 , aicFOURVAL28 , aicFOURVAL32];
+
+figure(6);
+num = linspace(14,112,8);
+plot(num, aic);
+grid on
+hold on
+plot(num, aicVAL);
+title('Confronto AIC');
+legend('Identificazione','Validazione');
+xlabel('N armoniche');
+ylabel('AIC');
+
+
+%Grazie al Test AIC ed ai grafici si nota che sia i modello migliori
+%risultano essere: Fourier con 28 armoniche, Fourier con 14 armoniche anche se la lineare
 %di ordine 2 in alcuni casi si comporta meglio!

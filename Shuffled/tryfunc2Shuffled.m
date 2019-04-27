@@ -18,12 +18,16 @@ dom = T(1,5);
 lun = T(1,6);
 mar = T(1,7);
 
-w = 1; %  2 * pi/365;
+w = 1;
 phiFourPrev = ones(size(mer));
-for n = 1:2
+for n = 1:1
     phiFourPrev = [phiFourPrev, cos(n*w.*mer),sin(n*w.*mer),cos(n*w.*gio),sin(n*w.*gio),cos(n*w.*ven),sin(n*w.*ven),cos(n*w.*sab),sin(n*w.*sab),cos(n*w.*dom),sin(n*w.*dom),cos(n*w.*lun),sin(n*w.*lun),cos(n*w.*mar),sin(n*w.*mar)];
 end
 
-PREVISIONE = phiFourPrev * thetaCapFour;
+PREVISIONE = phiFourPrev * thetaCapFour4;
+
+%Tentativo con modello lineare.... risultato scarso rispetto a Fourier 
+phiLPrev = [ones(length(mer),1),mer,gio,ven,sab,dom,lun,mar,mer.*gio,mer.*ven,mer.*sab,mer.*dom,mer.*lun,mer.*mar,gio.*ven,gio.*sab,gio.*dom,gio.*lun,gio.*mar,gio.*mer,ven.*sab,ven.*dom,ven.*lun,ven.*mar,ven.*mer,sab.*dom,sab.*lun,sab.*mar,sab.*mer,dom.*lun,dom.*mar,dom.*mer,lun.*mar,lun.*mer,mar.*mer,mer.^2,gio.^2,ven.^2,sab.^2,dom.^2,lun.^2,mar.^2];
+PREVISIONELINEARE =  phiLPrev * thetaCapL2;
 
 %Atteso: 33.119001948874995    dati da 315 a 322
