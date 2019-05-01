@@ -57,6 +57,8 @@ for i=1:103
     end
 end
 
+%Fisso il seme per il random
+rng(730); 
 %Mischio casualmente le settimane 
 shuffledArray = misure(randperm(size(misure,1)),:);
 %IN QUESTO MODO HO SETTIMANE DA MERCOLEDI A MARTEDI CASUALI, CONTENENTI
@@ -94,6 +96,8 @@ y1 = y(1:70); %tolgo il primo che e' solo un dato e stimo l' 81 esimo
 %Visualizzo i consumi in relazione al giorno della settimana
 y2 = y(71:102);
 y2 = vertcat(y2,y2fin);
+
+shuffledTarget = vertcat(y1,y2);
 
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %Un primo approccio e' la stima lineare di ordine 2 LS
@@ -347,8 +351,8 @@ SSRFOURVAL112 = scartoFourVAL112' * scartoFourVAL112;
 %Utilizzo un solo layer nascosto, con 20 neuroni
 %Utilizzando algoritmo Bayesiano, il grafico di regressione esce
 
-x = [mer gio ven sab dom lun mar]';
-t = (vertcat(y1,y2))';
+x = shuffledArray';
+t = shuffledTarget';
 
 % Choose a Training Function
 % For a list of all training functions type: help nntrain
@@ -358,7 +362,7 @@ t = (vertcat(y1,y2))';
 trainFcn = 'trainscg';  % Bayesian Regularization backpropagation.
 
 % Create a Fitting Network
-hiddenLayerSize = 20;
+hiddenLayerSize = 25;
 net = fitnet(hiddenLayerSize,trainFcn);
 
 % Choose Input and Output Pre/Post-Processing Functions
@@ -366,11 +370,11 @@ net.input.processFcns = {'removeconstantrows','mapminmax'};
 net.output.processFcns = {'removeconstantrows','mapminmax'};
 
 % Setup Division of Data for Training, Validation, Testing
-net.divideFcn = 'dividerand';  % Divide data randomly
-net.divideMode = 'sample';  % Divide up every sample
-net.divideParam.trainRatio = 60/100;
+%net.divideFcn = 'dividerand';  % Divide data randomly
+%net.divideMode = 'sample';  % Divide up every sample
+net.divideParam.trainRatio = 65/100;
 net.divideParam.valRatio = 20/100;
-net.divideParam.testRatio = 20/100;
+net.divideParam.testRatio = 25/100;
 
 % Choose a Performance Function
 net.performFcn = 'mse';  % Mean Squared Error
@@ -430,29 +434,29 @@ fpeFOUR = ((length(vertcat(y1,y2))+length(thetaCapFour))/(length(vertcat(y1,y2))
 %TEST AIC
 aicL2 = (2*length(thetaCapL2)/length(y1))+log(SSRL2);
 aicL3 = (2*length(thetaCapL3)/length(y1))+log(SSRL3);
-aicFOUR4 = (2*length(thetaCapFour14)/length(y1))+log(SSRFOUR14);
+aicFOUR14 = (2*length(thetaCapFour14)/length(y1))+log(SSRFOUR14);
 aicFOUR = (2*length(thetaCapFour)/length(y1))+log(SSRFOUR);
-aicFOUR12 = (2*length(thetaCapFour42)/length(y1))+log(SSRFOUR42);
-aicFOUR16 = (2*length(thetaCapFour56)/length(y1))+log(SSRFOUR56);
-aicFOUR20 = (2*length(thetaCapFour70)/length(y1))+log(SSRFOUR70);
-aicFOUR24 = (2*length(thetaCapFour84)/length(y1))+log(SSRFOUR84);
-aicFOUR28 = (2*length(thetaCapFour98)/length(y1))+log(SSRFOUR98);
-aicFOUR32 = (2*length(thetaCapFour112)/length(y1))+log(SSRFOUR112);
+aicFOUR42 = (2*length(thetaCapFour42)/length(y1))+log(SSRFOUR42);
+aicFOUR56 = (2*length(thetaCapFour56)/length(y1))+log(SSRFOUR56);
+aicFOUR70 = (2*length(thetaCapFour70)/length(y1))+log(SSRFOUR70);
+aicFOUR84 = (2*length(thetaCapFour84)/length(y1))+log(SSRFOUR84);
+aicFOUR98 = (2*length(thetaCapFour98)/length(y1))+log(SSRFOUR98);
+aicFOUR112 = (2*length(thetaCapFour112)/length(y1))+log(SSRFOUR112);
 aicNET = (2*length(thetaCapNET)/nt)+log(SSRNET);
 
 %TEST AIC VAL
 aicL2VAL = (2*length(thetaCapL2)/length(y))+log(SSRL2VAL);
-aicFOURVAL4 = (2*length(thetaCapFour14)/length(y2))+log(SSRFOURVAL14);
+aicFOURVAL14 = (2*length(thetaCapFour14)/length(y2))+log(SSRFOURVAL14);
 aicFOURVAL = (2*length(thetaCapFour)/length(y2))+log(SSRFOURVAL);
-aicFOURVAL12 = (2*length(thetaCapFour42)/length(y2))+log(SSRFOURVAL42);
-aicFOURVAL16 = (2*length(thetaCapFour56)/length(y2))+log(SSRFOURVAL56);
-aicFOURVAL20 = (2*length(thetaCapFour70)/length(y2))+log(SSRFOURVAL70);
-aicFOURVAL24 = (2*length(thetaCapFour84)/length(y2))+log(SSRFOURVAL84);
-aicFOURVAL28 = (2*length(thetaCapFour98)/length(y2))+log(SSRFOURVAL98);
-aicFOURVAL32 = (2*length(thetaCapFour112)/length(y2))+log(SSRFOURVAL112);
+aicFOURVAL42 = (2*length(thetaCapFour42)/length(y2))+log(SSRFOURVAL42);
+aicFOURVAL56 = (2*length(thetaCapFour56)/length(y2))+log(SSRFOURVAL56);
+aicFOURVAL70 = (2*length(thetaCapFour70)/length(y2))+log(SSRFOURVAL70);
+aicFOURVAL84 = (2*length(thetaCapFour84)/length(y2))+log(SSRFOURVAL84);
+aicFOURVAL98 = (2*length(thetaCapFour98)/length(y2))+log(SSRFOURVAL98);
+aicFOURVAL112 = (2*length(thetaCapFour112)/length(y2))+log(SSRFOURVAL112);
 
-aic = [ aicFOUR4 , aicFOUR , aicFOUR12 , aicFOUR16 , aicFOUR20 , aicFOUR24 , aicFOUR28 , aicFOUR32];
-aicVAL = [aicFOURVAL4 , aicFOURVAL , aicFOURVAL12 , aicFOURVAL16 , aicFOURVAL20 , aicFOURVAL24 , aicFOURVAL28 , aicFOURVAL32];
+aic = [ aicFOUR14 , aicFOUR , aicFOUR42 , aicFOUR56 , aicFOUR70 , aicFOUR84 , aicFOUR98 , aicFOUR112];
+aicVAL = [aicFOURVAL14 , aicFOURVAL , aicFOURVAL42 , aicFOURVAL56 , aicFOURVAL70 , aicFOURVAL84 , aicFOURVAL98 , aicFOURVAL112];
 
 figure(6);
 num = linspace(14,112,8);
