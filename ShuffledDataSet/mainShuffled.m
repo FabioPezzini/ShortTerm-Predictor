@@ -63,7 +63,19 @@ for i=1:103
 end
 
 %Fisso il seme per il random
+
+%il mercoledi lo devo dare come ingresso, come uscita stimo il successivo!
+%tolgo il primo che e' solo un dato e stimo l' 81 esimo
+%Visualizzo i consumi in relazione al giorno della settimana
 rng(730); 
+y = misure(:,1);
+y(1,:) = [];
+temp = dataTabCp2(dataTabCp2(:,1)==365,:);
+y = vertcat(y,y2fin);
+y = y(randperm(size(misure,1)),:);
+y1 = y(1:70); %tolgo il primo che e' solo un dato e stimo l' 81 esimo
+%Visualizzo i consumi in relazione al giorno della settimana
+y2 = y(71:103);
 %Mischio casualmente le settimane 
 shuffledArray = misure(randperm(size(misure,1)),:);
 %IN QUESTO MODO HO SETTIMANE DA MERCOLEDI A MARTEDI CASUALI, CONTENENTI
@@ -93,14 +105,6 @@ lun2= lun(71:103,:);
 mar = shuffledArray(:,7);
 mar1= mar(1:70,:);
 mar2= mar(71:103,:);
-
-%il mercoledi lo devo dare come ingresso, come uscita stimo il successivo!
-y= mer;
-y(1,:) = [];
-y1 = y(1:70); %tolgo il primo che e' solo un dato e stimo l' 81 esimo
-%Visualizzo i consumi in relazione al giorno della settimana
-y2 = y(71:102);
-y2 = vertcat(y2,y2fin);
 
 shuffledTarget = vertcat(y1,y2);
 
@@ -478,6 +482,11 @@ elinID = gsubtract(y1,misuraStimataL2);
 elinVAL = gsubtract(y2,misuraStimataL2VAL);
 efouID = gsubtract(y1,misuraStimataFour14);
 efouVAL = gsubtract(y2,misuraStimataFourVAL14);
+
+
+
+
+
 MAPEnet = mean(abs(e./t));
 MAPElin2ID = mean(abs(elinID./y1));
 MAPElin2VAL = mean(abs(elinVAL./y2));
