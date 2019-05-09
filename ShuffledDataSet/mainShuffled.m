@@ -1,6 +1,3 @@
-clc;
-clear;
-close all;
 
 %Carico i dati all'interno di una tabella
 
@@ -81,8 +78,7 @@ shuffledArray = misure(randperm(size(misure,1)),:);
 %IN QUESTO MODO HO SETTIMANE DA MERCOLEDI A MARTEDI CASUALI, CONTENENTI
 %ANNO 1 E ANNO 2
 
-settimane(1:70,1) = 1:70;
-settimaneVal(1:33,1) = 1:33;
+
 
 mer = shuffledArray(:,1);
 mer1= mer(1:70,:);
@@ -107,6 +103,9 @@ mar1= mar(1:70,:);
 mar2= mar(71:103,:);
 
 shuffledTarget = vertcat(y1,y2);
+
+settimane(1:70,1) = 1:70;
+settimaneVal(1:33,1) = 1:33;
 
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %Un primo approccio e' la stima lineare di ordine 2 LS
@@ -482,10 +481,6 @@ elinID = gsubtract(y1,misuraStimataL2);
 elinVAL = gsubtract(y2,misuraStimataL2VAL);
 efouID = gsubtract(y1,misuraStimataFour14);
 efouVAL = gsubtract(y2,misuraStimataFourVAL14);
-
-
-
-
 
 MAPEnet = mean(abs(e./t));
 MAPElin2ID = mean(abs(elinID./y1));
